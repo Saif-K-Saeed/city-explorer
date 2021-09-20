@@ -21,6 +21,7 @@ class App extends React.Component {
     await this.setState({
       searchQuery: e.target.city.value
     })
+    console.log('key', process.env.REACT_APP_LOCATIONIQ_KEY);
 
     try {
       let reqUrl = `https://us1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&q=${this.state.searchQuery}&format=json`;
