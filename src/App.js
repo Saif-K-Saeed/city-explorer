@@ -34,7 +34,7 @@ class App extends React.Component {
       showCard: true,
     });
 
-    let url2 = `https://saif-city-explorer-api.herokuapp.com/getWeatherInfo?nameCity=${this.state.nameFromInput}`;
+    let url2 = `${process.env.REACT_APP_SERVER}getWeatherInfo?nameCity=${this.state.nameFromInput}`;
 
     let weatherCity = await axios.get(url2);
 
