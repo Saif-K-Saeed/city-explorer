@@ -1,104 +1,86 @@
-import React from 'react';
-import axios from 'axios';
-import { Card } from "react-bootstrap/";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Card from "react-bootstrap/Card";
+import axios from "axios";
+import Weather from "./components/Weather";
+
+// ////////////////////////////////////
 
 class App extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {
-      locationResult: {},
-      searchQuery: '',
-      showLocInfo: false,
-      showError: false
-    }
+      dataForCity: {},
+      nameFromInput: "",
+      showCard: false,
+      showWeather :false,
+      weatherData: [],
+    };
   }
 
-  getLocFun = async (e) => {
-    e.preventDefault();
+  getCityLocation = async (event) => {
+    event.preventDefault();
 
     await this.setState({
-      searchQuery: e.target.city.value
-    })
+      nameFromInput: event.target.cityName.value,
+    });
+    let url = `https://eu1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&q=${this.state.nameFromInput}&format=json`;
 
-    try {
-      let reqUrl = `https://us1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&q=${this.state.searchQuery}&format=json`;
 
-      let locResult = await axios.get(reqUrl);
+    let resData = await axios.get(url);
+    this.setState({
+      dataForCity: resData.data[0],
 
-      this.setState({
-        locationResult: locResult.data[0],
-        showLocInfo: true,
-        showError: false
-      })
-    } catch {
+      showCard: true,
+    });
 
-      this.setState({
-        showError: true,
-        showLocInfo: false
-      })
-    }
+    let url2 = `https://saif-city-explorer-api.herokuapp.com/getWeatherInfo?nameCity=${this.state.nameFromInput}`;
 
-  }
+    let weatherCity = await axios.get(url2);
+
+    await this.setState({
+      weatherData: weatherCity.data,
+      showWeather: true
+    });
+
+  };
 
   render() {
     return (
-      <div>
-        <h3>City Explorer app</h3>
+      <>
+        <h1>City Explorer</h1>
 
-        <form onSubmit={this.getLocFun} >
-          <input type="text" name='city' />
-          <input type="submit" value='get city info' />
+        <form onSubmit={this.getCityLocation}>
+          <input type="text" name="cityName" placeholder="type city name..." />
+
+          <input type="submit" value="Explorer!" />
         </form>
 
-        {this.state.showLocInfo &&
+        {this.state.showCard &&
+          <Card style={{ width: "30rem" }}>
+            <Card.Img
+              variant="top"
+              src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${this.state.dataForCity.lat},${this.state.dataForCity.lon}&zoom=12`}
+              alt="{this.state.dataForCity.display_name}"/>
+              
+            <Card.Body>
+              <Card.Title>{this.state.dataForCity.display_name}</Card.Title>
 
+              <Card.Text>
+                latitude: {this.state.dataForCity.lat}&nbsp; 
+                longitude:{"  "}{this.state.dataForCity.lon}
 
-          <>
-
-
-            <Card style={{ width: "30rem" }}>
-              {this.state.showLocInfo && (
-                <Card.Img
-                  variant="top"
-                  src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${this.state.locationResult.lat},${this.state.locationResult.lon}&zoom=10`} alt="city" />
-              )}
-
-              <Card.Body>
-                {this.state.showLocInfo && (
-                  <Card.Title>
-                    {this.state.locationResult.display_name}
-                  </Card.Title>
-                )}
-                {this.state.showLocInfo && (
-
-                  <Card.Text>
-
-                    latitude: {this.state.locationResult.lat}&nbsp;
-                    longitude:{" "}{this.state.locationResult.lon}
-                  </Card.Text>
-                )}
-              </Card.Body>
-            </Card>
-
-            {/* <p>City name: {this.state.searchQuery}</p>
-            <p>latitude: {this.state.locationResult.lat}</p>
-            <p>longitude: {this.state.locationResult.lon} </p>
-
-            <img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${this.state.locationResult.lat},${this.state.locationResult.lon}&zoom=10`} alt="city" /> */}
-
-          </>
+                {this.state.weatherData.map(info => {
+                  return (
+                    <Weather weatherData={info} />
+                  )
+                })}
+              </Card.Text>
+            </Card.Body>
+          </Card>
         }
-
-        {this.state.showError &&
-          <p>Something went wrong in getting location data</p>
-        }
-
-
-
-      </div>
-    )
+      </>
+    );
   }
 }
 
