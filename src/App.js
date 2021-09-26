@@ -70,7 +70,6 @@ class App extends React.Component {
               src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${this.state.dataForCity.lat},${this.state.dataForCity.lon}&zoom=12`}
               alt="{this.state.dataForCity.display_name}" />
             <Card.Body>
-
               <Card.Title>{this.state.dataForCity.display_name}</Card.Title>
               <Card.Text>
                 latitude: {this.state.dataForCity.lat}&nbsp;
