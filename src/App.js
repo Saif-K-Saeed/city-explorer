@@ -50,13 +50,11 @@ class App extends React.Component {
     const cityName = this.state.nameFromInput.charAt(0).toUpperCase() + this.state.nameFromInput.slice(1);
     let movieUrl = `${process.env.REACT_APP_SERVER}movies?city=${cityName}`;
     let movieData = await axios.get(movieUrl)
-    console.log(movieData.data);
     this.setState({
       movieInformation: movieData.data,
     })
 
   }
-
   render() {
     return (
       <div>
@@ -77,15 +75,12 @@ class App extends React.Component {
               <Card.Text>
                 latitude: {this.state.dataForCity.lat}&nbsp;
                 longitude:{"  "}{this.state.dataForCity.lon}
-                <Weather weather={this.state.weatherData}/>
+                <Weather weather={this.state.weatherData} />
                 <Movies movies={this.state.movieInformation} />
               </Card.Text>
             </Card.Body>
           </Card>
         }
-
-
-
       </div>
     );
   }
